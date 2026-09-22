@@ -5,6 +5,23 @@ TKNFRA proposes to deliver a machine-checked, B‑Method-based formal verificati
 (1) CIP‑0056 (Canton Network Token Standard) and (2) CIP‑0047 (Featured App Activity Markers).
 The output will be an open, reproducible set of formal specifications, invariants, and proof/model-check artifacts tied to specific released versions of the reference DAML packages (Splice), improving assurance and implementability across the ecosystem.
 
+## Dev Fund 2.0: RFP Alignment
+
+**Proposal type:** RFP-aligned proposal.  
+**Primary RFP:** **22. Daml Security Standards and Secure Development**, under **Security, Assurance & Incident Readiness** in the [2026–2028 Strategic Roadmap](https://github.com/canton-foundation/canton-dev-fund/blob/main/2026-2028-strategic-roadmap.md#security-assurance--incident-readiness).
+
+RFP 22 calls for reusable security practices, tooling, testing methodologies, review materials, and CI integration that help developers identify weaknesses before deploying or vetting Daml packages. This proposal addresses that need through formal specifications of two shared standards, an explicit catalog of security and accounting properties, reproducible verification evidence, and a practical review and regression workflow.
+
+The same deliverables also support:
+
+- **RFP 12. RWA Standards**, specifically **Daml and Institutional RWA Workflow Standards**: CIP‑0056 verification clarifies token transfer, allocation, and settlement behavior, with a reusable conformance checklist for multiple registries and applications.
+- **RFP 18. Integration into SDLCs**: verification scripts, version traceability, and the regression playbook let teams incorporate model checks and evidence review into their development and upgrade processes.
+
+These are supporting alignments within one proposal, with no additional funding request. The technical scope remains CIP‑0056 and CIP‑0047 and their pinned reference packages.
+
+**Suggested review coordination:** Security SIG, with input from Token Standards / Asset Standards and Daml Language & Developer Tooling.  
+**Champion:** Needs Champion; no confirmed Champion is recorded in this PR.
+
 ## Objective and Scope
 
 ### Objective
@@ -28,14 +45,43 @@ Create a reusable, maintainable, and ecosystem-facing **formal specification + v
 - Formalizing synchronizer consensus, topology, or privacy guarantees (we rely on Canton's correctness for synchronization/authorization; we model contract/workflow correctness at the Daml application layer).
 - Certifying every third‑party registry implementation of CIP‑0056. (We will, however, define a conformance contract that registry implementers can optionally use.)
 
-## Ecosystem Value
+## Ecosystem Need, Beneficiaries, and Adoption
 
-### CIP‑0056 is ecosystem-critical
-CIP‑0056 standardizes how wallets and apps interoperate with Canton tokens via a fixed set of APIs and workflows (including FOP transfers and DvP allocations/settlement). It is implemented in Splice and intended as a common base for tokens and wallet/app compatibility.
-A formal model for CIP‑0056 reduces ambiguity, increases confidence for integrators, and provides a stable "ground truth" for reasoning about upgrades and edge cases.
+### The problem the ecosystem needs to solve
 
-### CIP‑0047 affects incentive integrity
-CIP‑0047 introduces FeaturedAppActivityMarker creation and conversion into reward coupons, with constraints such as weight splitting summing to 1.0 and governance-defined marker value. Formalizing these invariants helps prevent subtle economic/accounting bugs and improves auditability.
+Teams integrating token transfers, allocation and settlement workflows, or featured-app activity markers need a shared understanding of the guarantees they can rely on. They must establish, for example, when allocated funds can be recovered, whether quantities are conserved through settlement, and whether a marker can be converted more than once or attributed to the wrong beneficiary.
+
+As different wallets, applications, and registries implement these workflows, inconsistent assumptions can create integration defects and make upgrades harder to review. A reusable formal specification makes those assumptions explicit, checks the modeled properties, and provides a common basis for comparing the CIP text with the selected reference implementation. This reduces repeated interpretation work and helps teams identify discrepancies before deployment.
+
+### Who benefits and how the work supports adoption
+
+| Intended users | How they use the deliverables | Expected adoption benefit |
+|---|---|---|
+| Splice and standards maintainers | Use the invariant catalog, version traceability, verification results, and regression playbook during changes to the covered standards. | Make upgrade assumptions visible and identify modeled regressions earlier. |
+| Wallet and application developers | Consult the plain-English guarantees and workflow mappings when integrating transfers, allocations, and settlement. | Reduce uncertainty about integration behavior and make shared interfaces easier to use consistently. |
+| Token registry implementers and asset issuers | Use the conformance checklist to assess the assumptions and observable behavior of their implementation. | Support interoperable implementations across multiple issuers and registries. |
+| Featured App developers | Review the creation, splitting, consumption, and beneficiary-attribution rules modeled for CIP‑0047. | Reduce ambiguity in activity-marker integration and reward-accounting behavior. |
+| Auditors and institutional technology/risk teams | Examine version-specific verification reports, assumptions, coverage, and unresolved obligations. | Provide reusable evidence for technical due diligence and a clearer basis for identifying additional checks before production use. |
+
+The adoption mechanism is practical: shared specifications reduce interpretation work; accessible checklists help developers apply them; reproducible evidence helps maintainers and reviewers assess changes. All outputs are open source and usable independently of a TKNFRA commercial engagement.
+
+### Evidence of need and validation with users
+
+The Foundation's published RFP 22 identifies secure Daml development as an ecosystem priority. RFP 12 also identifies interoperable token and settlement workflows as a funding priority. The [25 March 2026 review of this PR](https://github.com/canton-foundation/canton-dev-fund/pull/12#issuecomment-4128805520) recognized the value of the proposed assurance artifacts and requested clearer evidence of demand, intended users, and accessibility.
+
+The earlier author response described broader institutional engagement. That context is distinct from a commitment by a Canton team to adopt these deliverables. Specific users, workflows, and commitments will be recorded when confirmed. Milestone 1 already includes review with at least one ecosystem stakeholder; that review will be used to validate the priority workflow, intended user, and practical integration point, with feedback captured in public issues.
+
+### Adoption path and evidence of use
+
+1. **Milestone 1: validate a concrete use case.** Use the existing stakeholder review to identify a relevant integration or upgrade workflow and agree which properties and outputs would help the reviewer.
+2. **Milestones 2 and 3: make the evidence usable.** Publish the verification reports and reproducible runs for each standard, with plain-English properties, explicit assumptions, proof status, and bounded model-check coverage. Developers can read the guarantees and run the documented checks without writing B‑Method specifications.
+3. **Milestone 4: support use in an actual review.** Use the existing reviewer guide, conformance checklist, and regression playbook to support a maintainer or integrator in evaluating the pinned reference version or a proposed change. Record the workflow reviewed, reproduction results, usability feedback, and resulting corrections or open issues.
+
+The adoption target is for at least one external maintainer or integration team to reproduce a documented verification run and use the checklist or playbook in an integration or upgrade review. This is a proposed target, not a claim of an existing deployment or a third-party commitment. Participation and the review workflow will be agreed through the Milestone 1 engagement. Evidence of actual reuse will be reported separately from artifact publication and CI execution.
+
+### What the verification evidence establishes
+
+Reports will distinguish proved properties from bounded model-check results and list assumptions and unresolved obligations. A successful run establishes the reported properties of the model within that scope. Mapping the model to a Daml implementation does not by itself prove implementation equivalence or certify an arbitrary application. Reviewers will use the traceability and conformance materials alongside implementation testing and security review.
 
 ## Architectural Alignment with Canton and DAML
 
@@ -184,6 +230,12 @@ This is designed to support both:
 
 ### Total funding requested (initial): 410,000 CC
 
+## Maintenance and Reuse
+
+TKNFRA will maintain the models, verification scripts, and documentation through the funded milestones. The final handover will include pinned tool and package versions, reproducible release artifacts, and instructions for updating the model and rerunning verification as the standards evolve. The permissive license enables Canton maintainers and other contributors to reuse and extend the work.
+
+Post-grant stewardship and support arrangements will be agreed with the Foundation and interested maintainers during handover. Verification claims remain tied to the recorded versions; subsequent changes require the review and re-verification described in the regression playbook.
+
 ## Risks and Mitigations
 - **Risk: Scope creep into "generic Daml verification tooling".**
   - Mitigation: strict scope to CIP‑0056 and CIP‑0047 and their published interfaces; any generalization requires a separate proposal.
@@ -202,6 +254,8 @@ TKNFRA will staff:
 All deliverables will be open source under a permissive license compatible with Canton Foundation OSS norms (e.g., Apache‑2.0), unless the Foundation requests otherwise.
 
 ## References
+- Dev Fund 2.0 roadmap and RFPs: https://github.com/canton-foundation/canton-dev-fund/blob/main/2026-2028-strategic-roadmap.md#requests-for-proposals
+- RFP submission guidance: https://github.com/canton-foundation/canton-dev-fund/blob/main/rfps/README.md
 - CIP‑0056: https://github.com/canton-foundation/cips/blob/main/cip-0056/cip-0056.md
 - Token standard implementation (Splice): https://github.com/hyperledger-labs/splice/tree/main/token-standard
 - Token standard docs: https://docs.dev.sync.global/app_dev/token_standard/index.html
